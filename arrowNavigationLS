@@ -1,0 +1,107 @@
+<div class="clerk_main_container">
+  {% for item in products %}
+    <div class="clerk_product_card">
+      <a href="{{ item.url }}">
+        <div class="clerk_product_title">
+          {{ item.name }}
+        </div>
+      </a>
+      <div class="clerk_external_element">
+        ANY ELEMENT OUTSIDE A HREF
+      </div>
+    </div>
+  {% endfor  %}
+</div>
+
+<script>
+(() => {
+  const SELECTORS = {
+    container: '.clerk_main_container',
+    productCard: '.clerk_product_card',
+    link: 'a'
+  };
+
+  if (window._keyNavHandler) {
+    document.removeEventListener('keydown', window._keyNavHandler);
+  }
+
+  const container = document.querySelector(SELECTORS.container);
+  if (!container) {
+    console.error('Navigation: Container not found');
+    return;
+  }
+
+  const productCards = container.querySelectorAll(SELECTORS.productCard);
+  if (!productCards.length) {
+    console.warn('Navigation: No product cards found in container');
+    return;
+  }
+
+  const links = Array.from(productCards).map(card => card.querySelector(SELECTORS.link)).filter(Boolean);
+  if (!links.length) {
+    console.warn('Navigation: No selected elements found in container');
+    return;
+  }
+  
+  console.info('Navigation: Found', links.length, 'elements');
+  let currentIndex = 0;
+
+  container.setAttribute('tabindex', '-1');
+  container.focus();
+
+  if (productCards.length > 0) {
+    Array.from(productCards).forEach(card => card.classList.remove('highlight'));
+    productCards[0].classList.add('highlight');
+    links[0].focus();
+  }
+
+  function updateFocus() {
+    if (!productCards[currentIndex] || !links[currentIndex]) {
+      console.error('Navigation: Invalid index', currentIndex);
+      return;
+    }
+
+    Array.from(productCards).forEach(card => card.classList.remove('highlight'));
+    const currentCard = productCards[currentIndex];
+    const currentLink = links[currentIndex];
+    
+    currentCard.classList.add('highlight');
+    currentLink.focus();
+  }
+
+  window._keyNavHandler = (e) => {
+    if (!links.length) {
+      console.warn('Navigation: No elements available for navigation');
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentIndex = (currentIndex + 1) % links.length;
+      updateFocus();
+    }
+
+    else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentIndex = (currentIndex - 1 + links.length) % links.length;
+      updateFocus();
+    }
+
+    else if (e.key === 'Enter') {
+      if (currentIndex >= 0) {
+        e.preventDefault();
+        links[currentIndex].click();
+      }
+    }
+  };
+
+  document.addEventListener('keydown', window._keyNavHandler);
+})();
+</script>
+
+<style>
+.highlight {
+  background-color: #f0f0f0;
+  outline: none;
+}
+</style>
