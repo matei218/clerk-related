@@ -1,0 +1,38 @@
+/* omnisearch sorting style */
+
+.os-products-sort {
+  grid-area: products-sort;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-direction: row;
+  white-space: nowrap;
+  font-size: 16px;
+  gap: 0.5rem;
+}
+
+.os-products-sort > select {
+  appearance: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9em;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='14' height='10' viewBox='0 0 14 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23666' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.os-products-sort > select:focus {
+  outline: none;
+  border-color: #999;
+  box-shadow: none;
+  border: 1px solid #ccc;
+}
+
+.os-sort {
+	cursor: pointer;
+}
