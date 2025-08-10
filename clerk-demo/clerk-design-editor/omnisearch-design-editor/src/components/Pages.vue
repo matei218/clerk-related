@@ -1,13 +1,13 @@
 <template>
-  <div class="pages-component">
-    <div class="pages-container" :style="componentStyles">
-      <h3 class="pages-title">Site Pages</h3>
+  <div class="pages-component" :style="componentStyles">
+    <div class="pages-container global-container">
+      <h3 class="pages-title global-title">Site Pages</h3>
       <div class="pages-list">
         <a 
           v-for="page in pages" 
           :key="page.id"
           :href="page.link"
-          class="page-link"
+          class="page-link global-link"
         >
           {{ page.name }}
         </a>

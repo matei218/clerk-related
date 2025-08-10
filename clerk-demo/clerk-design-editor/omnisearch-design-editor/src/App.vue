@@ -28,16 +28,107 @@ const availableComponents = [
 const layout = ref([])
 const activeTab = ref('editor')
 const darkMode = ref(false)
+const notifications = ref([])
+const versionHistory = ref([])
+let notificationId = 0
 const globalStyles = ref({
-  fontSize: '16px',
-  fontFamily: 'Arial, sans-serif',
-  primaryColor: '#007bff',
-  backgroundColor: '#ffffff',
-  textColor: '#333333'
+  // Global elements that apply to all components
+  global: {
+    fontSize: '16px',
+    fontFamily: 'Arial, sans-serif',
+    primaryColor: '#007bff',
+    backgroundColor: '#ffffff',
+    textColor: '#333333',
+    titleColor: '#2c3e50',
+    subtitleColor: '#34495e',
+    linkColor: '#007bff',
+    buttonColor: '#007bff',
+    buttonTextColor: '#ffffff',
+    containerBorder: '#ddd',
+    cardShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  },
+  // Individual component styles
+  components: {
+    SearchBar: {
+      inputBorderColor: '#ddd',
+      inputFocusColor: '#007bff',
+      buttonHoverColor: '#0056b3'
+    },
+    SortingOptions: {
+      labelColor: '#333',
+      selectBorderColor: '#ddd',
+      selectFocusColor: '#007bff'
+    },
+    ProductFeed: {
+      titleColor: '#333',
+      priceColor: '#007bff',
+      ratingColor: '#ffc107',
+      cardBorderColor: '#ddd'
+    },
+    Facets: {
+      titleColor: '#333',
+      labelColor: '#555',
+      optionColor: '#666',
+      containerBackground: '#f8f9fa'
+    },
+    Pages: {
+      titleColor: '#333',
+      linkColor: '#333',
+      linkHoverColor: '#007bff',
+      containerBackground: '#f8f9fa'
+    },
+    Categories: {
+      titleColor: '#333',
+      nameColor: '#333',
+      countColor: '#666',
+      iconSize: '48px'
+    }
+  }
 })
 
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value
+  addNotification('Dark mode toggled', darkMode.value ? 'Enabled dark mode' : 'Enabled light mode', 'info')
+  addToHistory('Theme Change', darkMode.value ? 'Switched to dark mode' : 'Switched to light mode')
+}
+
+const addNotification = (title, message, type = 'success') => {
+  const notification = {
+    id: ++notificationId,
+    title,
+    message,
+    type,
+    timestamp: new Date()
+  }
+  notifications.value.push(notification)
+  
+  // Auto-remove notification after 3 seconds
+  setTimeout(() => {
+    removeNotification(notification.id)
+  }, 3000)
+}
+
+const removeNotification = (id) => {
+  const index = notifications.value.findIndex(n => n.id === id)
+  if (index > -1) {
+    notifications.value.splice(index, 1)
+  }
+}
+
+const addToHistory = (action, details) => {
+  versionHistory.value.unshift({
+    id: Date.now(),
+    action,
+    details,
+    timestamp: new Date(),
+    layout: JSON.parse(JSON.stringify(layout.value)),
+    styles: JSON.parse(JSON.stringify(globalStyles.value))
+  })
+  
+  // Keep only last 50 history items
+  if (versionHistory.value.length > 50) {
+    versionHistory.value = versionHistory.value.slice(0, 50)
+  }
 }
 
 const addRow = () => {
@@ -48,6 +139,8 @@ const addRow = () => {
       components: []
     }]
   })
+  addNotification('Row Added', 'New row added to layout', 'success')
+  addToHistory('Layout Change', 'Added new row')
 }
 
 const addColumn = (rowIndex) => {
@@ -55,6 +148,8 @@ const addColumn = (rowIndex) => {
     id: Date.now(),
     components: []
   })
+  addNotification('Column Added', `New column added to row ${rowIndex + 1}`, 'success')
+  addToHistory('Layout Change', `Added column to row ${rowIndex + 1}`)
 }
 
 const addComponent = (rowIndex, columnIndex, componentId) => {
@@ -66,6 +161,8 @@ const addComponent = (rowIndex, columnIndex, componentId) => {
       styles: {}
     })
     component.used = true
+    addNotification('Component Added', `${component.name} added to layout`, 'success')
+    addToHistory('Component Change', `Added ${component.name} to row ${rowIndex + 1}, column ${columnIndex + 1}`)
   }
 }
 
@@ -76,12 +173,16 @@ const removeComponent = (rowIndex, columnIndex, componentIndex) => {
     availableComponent.used = false
   }
   layout.value[rowIndex].columns[columnIndex].components.splice(componentIndex, 1)
+  addNotification('Component Removed', `${component.type} removed from layout`, 'info')
+  addToHistory('Component Change', `Removed ${component.type} from row ${rowIndex + 1}, column ${columnIndex + 1}`)
 }
 
 const moveRowUp = (rowIndex) => {
   if (rowIndex > 0) {
     const row = layout.value.splice(rowIndex, 1)[0]
     layout.value.splice(rowIndex - 1, 0, row)
+    addNotification('Row Moved', `Row ${rowIndex + 1} moved up`, 'info')
+    addToHistory('Layout Change', `Moved row ${rowIndex + 1} up`)
   }
 }
 
@@ -89,6 +190,8 @@ const moveRowDown = (rowIndex) => {
   if (rowIndex < layout.value.length - 1) {
     const row = layout.value.splice(rowIndex, 1)[0]
     layout.value.splice(rowIndex + 1, 0, row)
+    addNotification('Row Moved', `Row ${rowIndex + 1} moved down`, 'info')
+    addToHistory('Layout Change', `Moved row ${rowIndex + 1} down`)
   }
 }
 
@@ -148,19 +251,48 @@ const removeColumn = (rowIndex, columnIndex) => {
 }
 
 const computedGlobalStyles = computed(() => ({
-  fontSize: globalStyles.value.fontSize,
-  fontFamily: globalStyles.value.fontFamily,
-  color: globalStyles.value.textColor,
-  '--primary-color': globalStyles.value.primaryColor
+  fontSize: globalStyles.value.global.fontSize,
+  fontFamily: globalStyles.value.global.fontFamily,
+  color: globalStyles.value.global.textColor,
+  '--primary-color': globalStyles.value.global.primaryColor,
+  '--title-color': globalStyles.value.global.titleColor,
+  '--subtitle-color': globalStyles.value.global.subtitleColor,
+  '--link-color': globalStyles.value.global.linkColor,
+  '--button-color': globalStyles.value.global.buttonColor,
+  '--button-text-color': globalStyles.value.global.buttonTextColor,
+  '--container-border': globalStyles.value.global.containerBorder,
+  '--card-shadow': globalStyles.value.global.cardShadow
 }))
 
 const computedPreviewStyles = computed(() => ({
-  fontSize: globalStyles.value.fontSize,
-  fontFamily: globalStyles.value.fontFamily,
-  color: globalStyles.value.textColor,
-  backgroundColor: globalStyles.value.backgroundColor,
-  '--primary-color': globalStyles.value.primaryColor
+  fontSize: globalStyles.value.global.fontSize,
+  fontFamily: globalStyles.value.global.fontFamily,
+  color: globalStyles.value.global.textColor,
+  backgroundColor: globalStyles.value.global.backgroundColor,
+  '--primary-color': globalStyles.value.global.primaryColor,
+  '--title-color': globalStyles.value.global.titleColor,
+  '--subtitle-color': globalStyles.value.global.subtitleColor,
+  '--link-color': globalStyles.value.global.linkColor,
+  '--button-color': globalStyles.value.global.buttonColor,
+  '--button-text-color': globalStyles.value.global.buttonTextColor,
+  '--container-border': globalStyles.value.global.containerBorder,
+  '--card-shadow': globalStyles.value.global.cardShadow
 }))
+
+const getComponentStyles = (componentType) => {
+  const componentStyles = globalStyles.value.components[componentType] || {}
+  const cssVars = {}
+  
+  Object.entries(componentStyles).forEach(([key, value]) => {
+    const cssKey = '--' + key.replace(/([A-Z])/g, '-$1').toLowerCase()
+    cssVars[cssKey] = value
+  })
+  
+  return {
+    ...computedGlobalStyles.value,
+    ...cssVars
+  }
+}
 
 const generateHTML = () => {
   let html = `<!DOCTYPE html>
@@ -225,6 +357,12 @@ const generateHTML = () => {
             @click="activeTab = 'preview'"
           >
             Preview
+          </button>
+          <button 
+            :class="{ active: activeTab === 'history' }"
+            @click="activeTab = 'history'"
+          >
+            History ({{ versionHistory.length }})
           </button>
         </div>
         <button @click="toggleDarkMode" class="dark-mode-toggle">
@@ -340,37 +478,176 @@ const generateHTML = () => {
 
       <!-- Global Styles Tab -->
       <div v-if="activeTab === 'styles'" class="styles-content">
-        <h3>Global Styles</h3>
-        <div class="style-controls">
-          <div class="style-group">
-            <label>Font Size:</label>
-            <input v-model="globalStyles.fontSize" type="text" placeholder="16px" />
+        <div class="styles-sections">
+          <!-- Global Styles Section -->
+          <div class="style-section">
+            <h3>Global Styles</h3>
+            <p class="section-description">These styles apply to all components</p>
+            <div class="style-controls">
+              <div class="style-group">
+                <label>Font Size:</label>
+                <input v-model="globalStyles.global.fontSize" type="text" placeholder="16px" />
+              </div>
+              
+              <div class="style-group">
+                <label>Font Family:</label>
+                <select v-model="globalStyles.global.fontFamily">
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Helvetica, sans-serif">Helvetica</option>
+                  <option value="'Times New Roman', serif">Times New Roman</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="'Courier New', monospace">Courier New</option>
+                </select>
+              </div>
+              
+              <div class="style-group">
+                <label>Primary Color:</label>
+                <input v-model="globalStyles.global.primaryColor" type="color" />
+              </div>
+              
+              <div class="style-group">
+                <label>Background Color:</label>
+                <input v-model="globalStyles.global.backgroundColor" type="color" />
+              </div>
+              
+              <div class="style-group">
+                <label>Text Color:</label>
+                <input v-model="globalStyles.global.textColor" type="color" />
+              </div>
+              
+              <div class="style-group">
+                <label>Title Color:</label>
+                <input v-model="globalStyles.global.titleColor" type="color" />
+              </div>
+              
+              <div class="style-group">
+                <label>Link Color:</label>
+                <input v-model="globalStyles.global.linkColor" type="color" />
+              </div>
+              
+              <div class="style-group">
+                <label>Button Color:</label>
+                <input v-model="globalStyles.global.buttonColor" type="color" />
+              </div>
+            </div>
           </div>
-          
-          <div class="style-group">
-            <label>Font Family:</label>
-            <select v-model="globalStyles.fontFamily">
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="Helvetica, sans-serif">Helvetica</option>
-              <option value="'Times New Roman', serif">Times New Roman</option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="'Courier New', monospace">Courier New</option>
-            </select>
-          </div>
-          
-          <div class="style-group">
-            <label>Primary Color:</label>
-            <input v-model="globalStyles.primaryColor" type="color" />
-          </div>
-          
-          <div class="style-group">
-            <label>Background Color:</label>
-            <input v-model="globalStyles.backgroundColor" type="color" />
-          </div>
-          
-          <div class="style-group">
-            <label>Text Color:</label>
-            <input v-model="globalStyles.textColor" type="color" />
+
+          <!-- Component Styles Sections -->
+          <div class="style-section" v-for="(componentStyle, componentName) in globalStyles.components" :key="componentName">
+            <h4>{{ componentName }} Styles</h4>
+            <div class="style-controls">
+              <!-- SearchBar specific styles -->
+              <template v-if="componentName === 'SearchBar'">
+                <div class="style-group">
+                  <label>Input Border Color:</label>
+                  <input v-model="componentStyle.inputBorderColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Input Focus Color:</label>
+                  <input v-model="componentStyle.inputFocusColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Button Hover Color:</label>
+                  <input v-model="componentStyle.buttonHoverColor" type="color" />
+                </div>
+              </template>
+
+              <!-- SortingOptions specific styles -->
+              <template v-if="componentName === 'SortingOptions'">
+                <div class="style-group">
+                  <label>Label Color:</label>
+                  <input v-model="componentStyle.labelColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Select Border Color:</label>
+                  <input v-model="componentStyle.selectBorderColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Select Focus Color:</label>
+                  <input v-model="componentStyle.selectFocusColor" type="color" />
+                </div>
+              </template>
+
+              <!-- ProductFeed specific styles -->
+              <template v-if="componentName === 'ProductFeed'">
+                <div class="style-group">
+                  <label>Product Title Color:</label>
+                  <input v-model="componentStyle.titleColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Price Color:</label>
+                  <input v-model="componentStyle.priceColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Rating Color:</label>
+                  <input v-model="componentStyle.ratingColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Card Border Color:</label>
+                  <input v-model="componentStyle.cardBorderColor" type="color" />
+                </div>
+              </template>
+
+              <!-- Facets specific styles -->
+              <template v-if="componentName === 'Facets'">
+                <div class="style-group">
+                  <label>Facet Title Color:</label>
+                  <input v-model="componentStyle.titleColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Facet Label Color:</label>
+                  <input v-model="componentStyle.labelColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Option Text Color:</label>
+                  <input v-model="componentStyle.optionColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Container Background:</label>
+                  <input v-model="componentStyle.containerBackground" type="color" />
+                </div>
+              </template>
+
+              <!-- Pages specific styles -->
+              <template v-if="componentName === 'Pages'">
+                <div class="style-group">
+                  <label>Title Color:</label>
+                  <input v-model="componentStyle.titleColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Link Color:</label>
+                  <input v-model="componentStyle.linkColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Link Hover Color:</label>
+                  <input v-model="componentStyle.linkHoverColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Container Background:</label>
+                  <input v-model="componentStyle.containerBackground" type="color" />
+                </div>
+              </template>
+
+              <!-- Categories specific styles -->
+              <template v-if="componentName === 'Categories'">
+                <div class="style-group">
+                  <label>Title Color:</label>
+                  <input v-model="componentStyle.titleColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Category Name Color:</label>
+                  <input v-model="componentStyle.nameColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Count Text Color:</label>
+                  <input v-model="componentStyle.countColor" type="color" />
+                </div>
+                <div class="style-group">
+                  <label>Icon Size:</label>
+                  <input v-model="componentStyle.iconSize" type="text" placeholder="48px" />
+                </div>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -391,12 +668,31 @@ const generateHTML = () => {
                 v-for="component in column.components"
                 :key="component.id"
                 :is="components[component.type]"
-                :componentStyles="{ ...computedGlobalStyles, ...component.styles }"
+                :componentStyles="getComponentStyles(component.type)"
               />
             </div>
           </div>
         </div>
       </div>
+
+      <!-- History Tab -->
+      <div v-if="activeTab === 'history'" class="history-content">
+        <h3>Version History</h3>
+        <div v-if="versionHistory.length === 0" class="empty-history">
+          <p>No history yet.</p>
+        </div>
+        
+        <ul class="history-list">
+          <li v-for="entry in versionHistory" :key="entry.id" class="history-item">
+            <div class="history-info">
+              <strong>{{ entry.action }}</strong>
+              <span class="details">{{ entry.details }}</span>
+              <span class="timestamp">{{ new Date(entry.timestamp).toLocaleString() }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
     </main>
   </div>
 </template>

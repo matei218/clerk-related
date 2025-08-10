@@ -218,5 +218,61 @@
       "link": "/support"
     }
   ],
-  "searchPlaceholder": "Search for electronics, gadgets, and more..."
+  "searchPlaceholder": "Search for electronics, gadgets, and more...",
+  "styleElements": {
+    "global": {
+      "title": "global-title",
+      "subtitle": "global-subtitle", 
+      "text": "global-text",
+      "link": "global-link",
+      "button": "global-button",
+      "container": "global-container",
+      "card": "global-card"
+    },
+    "components": {
+      "SearchBar": {
+        "container": "search-container",
+        "input": "search-input",
+        "button": "search-button",
+        "placeholder": "search-placeholder"
+      },
+      "SortingOptions": {
+        "container": "sorting-container", 
+        "label": "sorting-label",
+        "select": "sorting-select"
+      },
+      "ProductFeed": {
+        "container": "products-container",
+        "grid": "products-grid",
+        "card": "product-card",
+        "image": "product-image",
+        "title": "product-title",
+        "price": "product-price",
+        "rating": "product-rating"
+      },
+      "Facets": {
+        "container": "facets-container",
+        "title": "facets-title",
+        "group": "facet-group",
+        "label": "facet-label",
+        "option": "facet-option",
+        "checkbox": "facet-checkbox"
+      },
+      "Pages": {
+        "container": "pages-container",
+        "title": "pages-title", 
+        "list": "pages-list",
+        "link": "page-link"
+      },
+      "Categories": {
+        "container": "categories-container",
+        "title": "categories-title",
+        "grid": "categories-grid", 
+        "card": "category-card",
+        "icon": "category-icon",
+        "name": "category-name",
+        "count": "category-count"
+      }
+    }
+  }
 }

@@ -23,5 +23,17 @@ export const dataService = {
 
   getSearchPlaceholder() {
     return mockData.searchPlaceholder
+  },
+
+  getStyleElements() {
+    return mockData.styleElements
+  },
+
+  getGlobalStyleElements() {
+    return mockData.styleElements.global
+  },
+
+  getComponentStyleElements(componentName) {
+    return mockData.styleElements.components[componentName] || {}
   }
 }

@@ -1,12 +1,12 @@
 <template>
-  <div class="categories-component">
-    <div class="categories-container" :style="componentStyles">
-      <h3 class="categories-title">Shop by Category</h3>
+  <div class="categories-component" :style="componentStyles">
+    <div class="categories-container global-container">
+      <h3 class="categories-title global-title">Shop by Category</h3>
       <div class="categories-grid">
         <div 
           v-for="category in categories" 
           :key="category.id"
-          class="category-card"
+          class="category-card global-card"
         >
           <div class="category-icon">{{ category.icon }}</div>
           <h4 class="category-name">{{ category.name }}</h4>

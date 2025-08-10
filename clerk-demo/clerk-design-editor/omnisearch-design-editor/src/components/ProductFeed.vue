@@ -1,7 +1,7 @@
 <template>
-  <div class="product-feed-component">
-    <div class="products-grid" :style="componentStyles">
-      <div class="product-card" v-for="product in products" :key="product.id">
+  <div class="product-feed-component" :style="componentStyles">
+    <div class="products-grid global-container">
+      <div class="product-card global-card" v-for="product in products" :key="product.id">
         <div class="product-image">
           <div class="image-placeholder">📦</div>
         </div>
