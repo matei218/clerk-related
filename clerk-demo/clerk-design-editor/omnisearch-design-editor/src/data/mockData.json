@@ -1,0 +1,222 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Wireless Bluetooth Headphones",
+      "price": 29.99,
+      "rating": 4,
+      "image": "headphones.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Smart Fitness Watch",
+      "price": 149.99,
+      "rating": 5,
+      "image": "smartwatch.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Portable Phone Charger",
+      "price": 19.99,
+      "rating": 3,
+      "image": "charger.jpg"
+    },
+    {
+      "id": 4,
+      "name": "USB-C Cable 6ft",
+      "price": 12.99,
+      "rating": 4,
+      "image": "cable.jpg"
+    },
+    {
+      "id": 5,
+      "name": "Wireless Mouse",
+      "price": 24.99,
+      "rating": 4,
+      "image": "mouse.jpg"
+    },
+    {
+      "id": 6,
+      "name": "Mechanical Keyboard",
+      "price": 89.99,
+      "rating": 5,
+      "image": "keyboard.jpg"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Electronics",
+      "icon": "📱",
+      "count": 45
+    },
+    {
+      "id": 2,
+      "name": "Clothing",
+      "icon": "👕",
+      "count": 78
+    },
+    {
+      "id": 3,
+      "name": "Home & Garden",
+      "icon": "🏠",
+      "count": 32
+    },
+    {
+      "id": 4,
+      "name": "Sports",
+      "icon": "⚽",
+      "count": 23
+    },
+    {
+      "id": 5,
+      "name": "Books",
+      "icon": "📚",
+      "count": 56
+    },
+    {
+      "id": 6,
+      "name": "Beauty",
+      "icon": "💄",
+      "count": 34
+    },
+    {
+      "id": 7,
+      "name": "Automotive",
+      "icon": "🚗",
+      "count": 18
+    },
+    {
+      "id": 8,
+      "name": "Kitchen",
+      "icon": "🍳",
+      "count": 29
+    }
+  ],
+  "sortingOptions": [
+    {
+      "value": "relevance",
+      "label": "Relevance"
+    },
+    {
+      "value": "price-low",
+      "label": "Price: Low to High"
+    },
+    {
+      "value": "price-high",
+      "label": "Price: High to Low"
+    },
+    {
+      "value": "newest",
+      "label": "Newest First"
+    },
+    {
+      "value": "rating",
+      "label": "Customer Rating"
+    },
+    {
+      "value": "bestseller",
+      "label": "Best Sellers"
+    }
+  ],
+  "facets": {
+    "priceRanges": [
+      {
+        "id": "under-25",
+        "label": "Under $25",
+        "min": 0,
+        "max": 25
+      },
+      {
+        "id": "25-50",
+        "label": "$25 - $50",
+        "min": 25,
+        "max": 50
+      },
+      {
+        "id": "50-100",
+        "label": "$50 - $100",
+        "min": 50,
+        "max": 100
+      },
+      {
+        "id": "over-100",
+        "label": "Over $100",
+        "min": 100,
+        "max": null
+      }
+    ],
+    "brands": [
+      {
+        "id": "techpro",
+        "name": "TechPro",
+        "count": 24
+      },
+      {
+        "id": "smartgear",
+        "name": "SmartGear",
+        "count": 18
+      },
+      {
+        "id": "nextteck",
+        "name": "NextTech",
+        "count": 31
+      },
+      {
+        "id": "ultradevices",
+        "name": "UltraDevices",
+        "count": 15
+      }
+    ],
+    "ratings": [
+      {
+        "stars": 5,
+        "label": "⭐⭐⭐⭐⭐ & Up",
+        "count": 42
+      },
+      {
+        "stars": 4,
+        "label": "⭐⭐⭐⭐ & Up",
+        "count": 78
+      },
+      {
+        "stars": 3,
+        "label": "⭐⭐⭐ & Up",
+        "count": 95
+      }
+    ]
+  },
+  "pages": [
+    {
+      "id": 1,
+      "name": "Home",
+      "link": "/"
+    },
+    {
+      "id": 2,
+      "name": "Products",
+      "link": "/products"
+    },
+    {
+      "id": 3,
+      "name": "About Us",
+      "link": "/about"
+    },
+    {
+      "id": 4,
+      "name": "Contact",
+      "link": "/contact"
+    },
+    {
+      "id": 5,
+      "name": "Blog",
+      "link": "/blog"
+    },
+    {
+      "id": 6,
+      "name": "Support",
+      "link": "/support"
+    }
+  ],
+  "searchPlaceholder": "Search for electronics, gadgets, and more..."
+}
