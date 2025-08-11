@@ -1,0 +1,52 @@
+{
+  "global": {
+    "fontSize": "16px",
+    "fontFamily": "Arial, sans-serif",
+    "primaryColor": "#007bff",
+    "backgroundColor": "#ffffff",
+    "textColor": "#333333",
+    "titleColor": "#2c3e50",
+    "subtitleColor": "#34495e",
+    "linkColor": "#007bff",
+    "buttonColor": "#007bff",
+    "buttonTextColor": "#ffffff",
+    "containerBorder": "#ddd",
+    "cardShadow": "0 2px 4px rgba(0,0,0,0.1)"
+  },
+  "components": {
+    "SearchBar": {
+      "inputBorderColor": "#ddd",
+      "inputFocusColor": "#007bff",
+      "buttonHoverColor": "#0056b3"
+    },
+    "SortingOptions": {
+      "labelColor": "#333",
+      "selectBorderColor": "#ddd",
+      "selectFocusColor": "#007bff"
+    },
+    "ProductFeed": {
+      "titleColor": "#333",
+      "priceColor": "#007bff",
+      "ratingColor": "#ffc107",
+      "cardBorderColor": "#ddd"
+    },
+    "Facets": {
+      "titleColor": "#333",
+      "labelColor": "#555",
+      "optionColor": "#666",
+      "containerBackground": "#f8f9fa"
+    },
+    "Pages": {
+      "titleColor": "#333",
+      "linkColor": "#333",
+      "linkHoverColor": "#007bff",
+      "containerBackground": "#f8f9fa"
+    },
+    "Categories": {
+      "titleColor": "#333",
+      "nameColor": "#333",
+      "countColor": "#666",
+      "iconSize": "48px"
+    }
+  }
+}
