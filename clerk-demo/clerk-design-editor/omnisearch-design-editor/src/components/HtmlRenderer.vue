@@ -2,13 +2,17 @@
   <div class="html-renderer">
     <div class="generated-layout" :style="computedStyles">
       <div v-for="row in layout" :key="row.id" class="generated-row">
-        <div v-for="column in row.columns" :key="column.id" class="generated-column">
-          <component 
+        <div v-for="column in row.columns" :key="column.id" class="generated-column" :style="{ width: column.width || 'auto' }">
+          <div 
             v-for="component in column.components"
             :key="component.id"
-            :is="components[component.type]"
-            :componentStyles="getComponentStyles(component.type)"
-          />
+            :style="getComponentStyles(component.type)"
+          >
+            <component 
+              :is="components[component.type]"
+              :componentStyles="getComponentStyles(component.type)"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -135,7 +139,5 @@ defineExpose({
   gap: 20px;
 }
 
-.generated-column {
-  flex: 1;
-}
+/* .generated-column styles removed to allow custom widths */
 </style>

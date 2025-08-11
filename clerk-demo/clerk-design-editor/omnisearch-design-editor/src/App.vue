@@ -83,7 +83,9 @@ const addRow = () => {
     id: Date.now(),
     columns: [{
       id: Date.now() + 1,
-      components: []
+      components: [],
+      width: '100%',
+      manualWidth: false
     }]
   })
   addNotification('Row Added', 'New row added to layout', 'success')
@@ -91,10 +93,32 @@ const addRow = () => {
 }
 
 const addColumn = (rowIndex) => {
-  layout.value[rowIndex].columns.push({
+  const row = layout.value[rowIndex]
+  const newColumn = {
     id: Date.now(),
-    components: []
-  })
+    components: [],
+    width: '25%',
+    manualWidth: false
+  }
+  row.columns.push(newColumn)
+  
+  // Only auto-adjust columns that haven't been manually set
+  const manualColumns = row.columns.filter(col => col.manualWidth)
+  const autoColumns = row.columns.filter(col => !col.manualWidth)
+  
+  if (autoColumns.length > 0) {
+    // Calculate remaining width after manual columns
+    const manualWidthTotal = manualColumns.reduce((total, col) => {
+      return total + parseFloat(col.width)
+    }, 0)
+    const remainingWidth = Math.max(100 - manualWidthTotal, 0)
+    const autoWidth = `${(remainingWidth / autoColumns.length).toFixed(1)}%`
+    
+    autoColumns.forEach(col => {
+      col.width = autoWidth
+    })
+  }
+  
   addNotification('Column Added', `New column added to row ${rowIndex + 1}`, 'success')
   addToHistory('Layout Change', `Added column to row ${rowIndex + 1}`)
 }
@@ -195,12 +219,39 @@ const removeColumn = (rowIndex, columnIndex) => {
     }
   })
   layout.value[rowIndex].columns.splice(columnIndex, 1)
+  
+  // Only redistribute auto columns
+  const row = layout.value[rowIndex]
+  if (row.columns.length > 0) {
+    const manualColumns = row.columns.filter(col => col.manualWidth)
+    const autoColumns = row.columns.filter(col => !col.manualWidth)
+    
+    if (autoColumns.length > 0) {
+      const manualWidthTotal = manualColumns.reduce((total, col) => {
+        return total + parseFloat(col.width)
+      }, 0)
+      const remainingWidth = Math.max(100 - manualWidthTotal, 0)
+      const autoWidth = `${(remainingWidth / autoColumns.length).toFixed(1)}%`
+      
+      autoColumns.forEach(col => {
+        col.width = autoWidth
+      })
+    }
+  }
 }
 
 
 
 
 const htmlRendererRef = ref(null)
+
+const changeColumnWidth = (rowIndex, columnIndex, width) => {
+  const column = layout.value[rowIndex].columns[columnIndex]
+  column.width = width
+  column.manualWidth = true
+  addNotification('Column Width Changed', `Column ${columnIndex + 1} width set to ${width}`, 'info')
+  addToHistory('Layout Change', `Changed column ${columnIndex + 1} width to ${width} in row ${rowIndex + 1}`)
+}
 
 const generateHTML = () => {
   if (htmlRendererRef.value) {
@@ -302,13 +353,24 @@ const generateHTML = () => {
                 v-for="(column, columnIndex) in row.columns" 
                 :key="column.id"
                 class="column-container"
+                :style="{ width: column.width }"
               >
                 <div class="column-header">
-                  <span>Column {{ columnIndex + 1 }}</span>
+                  <span>
+                    Column {{ columnIndex + 1 }} ({{ column.width }})
+                    <span v-if="column.manualWidth" class="manual-width-indicator" title="Manual width set">📌</span>
+                  </span>
                   <div class="column-controls">
-                    <button @click="moveColumnLeft(rowIndex, columnIndex)" :disabled="columnIndex === 0">←</button>
-                    <button @click="moveColumnRight(rowIndex, columnIndex)" :disabled="columnIndex === row.columns.length - 1">→</button>
-                    <button @click="removeColumn(rowIndex, columnIndex)" class="btn-danger">×</button>
+                    <button @click="moveColumnLeft(rowIndex, columnIndex)" :disabled="columnIndex === 0" title="Move Left">←</button>
+                    <button @click="moveColumnRight(rowIndex, columnIndex)" :disabled="columnIndex === row.columns.length - 1" title="Move Right">→</button>
+                    <div class="width-controls">
+                      <button @click="changeColumnWidth(rowIndex, columnIndex, '15%')" :class="{ active: column.width === '15%' }" title="15% Width">15%</button>
+                      <button @click="changeColumnWidth(rowIndex, columnIndex, '20%')" :class="{ active: column.width === '20%' }" title="20% Width">20%</button>
+                      <button @click="changeColumnWidth(rowIndex, columnIndex, '25%')" :class="{ active: column.width === '25%' }" title="25% Width">25%</button>
+                      <button @click="changeColumnWidth(rowIndex, columnIndex, '30%')" :class="{ active: column.width === '30%' }" title="30% Width">30%</button>
+                      <button @click="changeColumnWidth(rowIndex, columnIndex, '50%')" :class="{ active: column.width === '50%' }" title="50% Width">50%</button>
+                    </div>
+                    <button @click="removeColumn(rowIndex, columnIndex)" class="btn-danger" title="Delete Column">×</button>
                   </div>
                 </div>
                 
