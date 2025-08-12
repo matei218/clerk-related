@@ -1,4 +1,6 @@
 /* === Base Dashboard Theme Reset === */
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
   --primary-color: #0a84ff;
   --bg-light: #f9fafb;
@@ -11,7 +13,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-family: "Urbanist", sans-serif;
   font-size: 14px;
   color: var(--text-color);
   background: var(--bg-light);
@@ -23,16 +25,16 @@ body {
 .design-editor {
   min-height: 100vh;
   background: var(--bg-light);
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-header {
-  background: var(--bg-card);
-  padding: 16px 24px;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow);
 }
 
 .header-controls {
@@ -60,7 +62,6 @@ body {
 .editor-header h1 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
 }
 
 .tabs {
@@ -144,7 +145,7 @@ body {
 
 .editor-main {
   display: flex;
-  height: calc(100vh - 100px);
+  flex: 1;
 }
 
 .editor-content {
@@ -153,12 +154,14 @@ body {
 }
 
 .sidebar {
-  width: 300px;
-  background: var(--bg-card);
+  width: 200px;
   padding: 20px;
-  border-right: 1px solid var(--border-color);
   overflow-y: auto;
-  box-shadow: var(--shadow);
+  border-right: 1px solid var(--border-color);
+}
+
+.sidebar h3{
+  margin: 0 0 10px;
 }
 
 .component-list {
@@ -170,16 +173,10 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 5px;
-  border-radius: var(--radius);
-  background: var(--bg-card);
+  margin-bottom: 2px;
   color: var(--text-color);
   transition: all 0.2s;
-}
-
-.component-item:hover {
-  background: #f3f4f6;
+  cursor: default;
 }
 
 .component-item.used {
@@ -193,19 +190,24 @@ body {
 }
 
 .actions {
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .canvas {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  max-width: 1240px;
+  margin: auto;
 }
 
 .empty-canvas {
   text-align: center;
   padding: 50px;
   color: var(--text-muted);
+  font-style: italic;
 }
 
 .row-container {
@@ -273,17 +275,24 @@ body {
   display: flex;
   min-height: 200px;
   flex-wrap: nowrap;
-  overflow-x: auto;
+  overflow-x: hidden;
+  padding: 8px 4px;
+  box-sizing: border-box;
 }
 
 .column-container {
   min-width: 0;
-  border-right: 1px solid #eee;
   flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0 4px;
 }
 
-.column-container:last-child {
-  border-right: none;
+.column-inner {
+  background: #fafbfc;
+  border-radius: 6px;
+  border: 1px solid #e1e5e9;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  height: 100%;
 }
 
 .column-header {
@@ -681,6 +690,13 @@ button:disabled {
   margin: 5px 0;
 }
 
+.product-list-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--list-price-color, var(--primary-list-color));
+  margin: 5px 0;
+}
+
 .product-rating {
   font-size: 14px;
   color: var(--rating-color, #ffc107);
@@ -925,8 +941,10 @@ button:disabled {
   color: var(--text-color);
 }
 
-.design-editor.dark-mode .column-container {
-  border-right-color: var(--border-color);
+.design-editor.dark-mode .column-inner {
+  background: #252d38;
+  border-color: #3f4a56;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .design-editor.dark-mode .component-wrapper {
@@ -1036,6 +1054,24 @@ button:disabled {
   border-color: var(--primary-color);
 }
 
+/* Transition Animations */
+.rows-container {
+  width: 100%;
+  position: relative;
+}
+
+.columns-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.components-container {
+  width: 100%;
+}
+
+
+
 /* Dark Mode Last Change Tab */
 .design-editor.dark-mode .last-change-tab {
   background: var(--bg-card);
@@ -1054,3 +1090,4 @@ button:disabled {
 .design-editor.dark-mode .change-details {
   color: var(--text-muted);
 }
+

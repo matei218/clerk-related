@@ -3,6 +3,7 @@
     "fontSize": "16px",
     "fontFamily": "Arial, sans-serif",
     "primaryColor": "#007bff",
+    "primaryListColor": "#28a745",
     "backgroundColor": "#ffffff",
     "textColor": "#333333",
     "titleColor": "#2c3e50",
@@ -27,6 +28,7 @@
     "ProductFeed": {
       "titleColor": "#333",
       "priceColor": "#007bff",
+      "listPriceColor": "#28a745",
       "ratingColor": "#ffc107",
       "cardBorderColor": "#ddd"
     },

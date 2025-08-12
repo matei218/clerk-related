@@ -8,6 +8,7 @@
         <div class="product-info">
           <h3 class="product-title">{{ product.name }}</h3>
           <p class="product-price">${{ product.price }}</p>
+          <p class="product-list-price">${{ product.list_price }}</p>
           <div class="product-rating">
             <span v-for="star in 5" :key="star" class="star">
               {{ star <= product.rating ? '⭐' : '☆' }}

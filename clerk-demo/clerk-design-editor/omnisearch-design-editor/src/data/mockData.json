@@ -4,6 +4,8 @@
       "id": 1,
       "name": "Wireless Bluetooth Headphones",
       "price": 29.99,
+      "list_price": 39.99,
+      "badge": "Sale",
       "rating": 4,
       "image": "headphones.jpg"
     },
@@ -11,6 +13,8 @@
       "id": 2,
       "name": "Smart Fitness Watch",
       "price": 149.99,
+      "list_price": 169.99,
+      "badge": "Best Seller",
       "rating": 5,
       "image": "smartwatch.jpg"
     },
@@ -18,6 +22,8 @@
       "id": 3,
       "name": "Portable Phone Charger",
       "price": 19.99,
+      "list_price": 24.99,
+      "badge": "Value",
       "rating": 3,
       "image": "charger.jpg"
     },
@@ -25,6 +31,8 @@
       "id": 4,
       "name": "USB-C Cable 6ft",
       "price": 12.99,
+      "list_price": 14.99,
+      "badge": "Popular",
       "rating": 4,
       "image": "cable.jpg"
     },
@@ -32,6 +40,8 @@
       "id": 5,
       "name": "Wireless Mouse",
       "price": 24.99,
+      "list_price": 29.99,
+      "badge": "Top Rated",
       "rating": 4,
       "image": "mouse.jpg"
     },
@@ -39,6 +49,8 @@
       "id": 6,
       "name": "Mechanical Keyboard",
       "price": 89.99,
+      "list_price": 109.99,
+      "badge": "Premium",
       "rating": 5,
       "image": "keyboard.jpg"
     }
@@ -46,51 +58,35 @@
   "categories": [
     {
       "id": 1,
-      "name": "Electronics",
-      "icon": "📱",
-      "count": 45
+      "name": "Electronics"
     },
     {
       "id": 2,
-      "name": "Clothing",
-      "icon": "👕",
-      "count": 78
+      "name": "Clothing"
     },
     {
       "id": 3,
-      "name": "Home & Garden",
-      "icon": "🏠",
-      "count": 32
+      "name": "Home & Garden"
     },
     {
       "id": 4,
-      "name": "Sports",
-      "icon": "⚽",
-      "count": 23
+      "name": "Sports"
     },
     {
       "id": 5,
-      "name": "Books",
-      "icon": "📚",
-      "count": 56
+      "name": "Books"
     },
     {
       "id": 6,
-      "name": "Beauty",
-      "icon": "💄",
-      "count": 34
+      "name": "Beauty"
     },
     {
       "id": 7,
-      "name": "Automotive",
-      "icon": "🚗",
-      "count": 18
+      "name": "Automotive"
     },
     {
       "id": 8,
-      "name": "Kitchen",
-      "icon": "🍳",
-      "count": 29
+      "name": "Kitchen"
     }
   ],
   "sortingOptions": [
@@ -222,7 +218,7 @@
   "styleElements": {
     "global": {
       "title": "global-title",
-      "subtitle": "global-subtitle", 
+      "subtitle": "global-subtitle",
       "text": "global-text",
       "link": "global-link",
       "button": "global-button",
@@ -237,7 +233,7 @@
         "placeholder": "search-placeholder"
       },
       "SortingOptions": {
-        "container": "sorting-container", 
+        "container": "sorting-container",
         "label": "sorting-label",
         "select": "sorting-select"
       },
@@ -260,14 +256,14 @@
       },
       "Pages": {
         "container": "pages-container",
-        "title": "pages-title", 
+        "title": "pages-title",
         "list": "pages-list",
         "link": "page-link"
       },
       "Categories": {
         "container": "categories-container",
         "title": "categories-title",
-        "grid": "categories-grid", 
+        "grid": "categories-grid",
         "card": "category-card",
         "icon": "category-icon",
         "name": "category-name",

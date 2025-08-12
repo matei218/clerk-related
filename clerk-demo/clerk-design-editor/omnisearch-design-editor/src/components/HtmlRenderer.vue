@@ -54,6 +54,7 @@ const computedStyles = computed(() => ({
   color: props.globalStyles.global.textColor,
   backgroundColor: props.globalStyles.global.backgroundColor,
   '--primary-color': props.globalStyles.global.primaryColor,
+  '--primary-list-color': props.globalStyles.global.primaryListColor,
   '--title-color': props.globalStyles.global.titleColor,
   '--subtitle-color': props.globalStyles.global.subtitleColor,
   '--link-color': props.globalStyles.global.linkColor,
@@ -125,7 +126,8 @@ defineExpose({
 <style scoped>
 .html-renderer {
   width: 100%;
-  height: 100%;
+  max-width: 1240px;
+  margin: auto;
 }
 
 .generated-layout {

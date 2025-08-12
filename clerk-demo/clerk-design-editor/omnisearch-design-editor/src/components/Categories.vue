@@ -8,9 +8,7 @@
           :key="category.id"
           class="category-card global-card"
         >
-          <div class="category-icon">{{ category.icon }}</div>
           <h4 class="category-name">{{ category.name }}</h4>
-          <p class="category-count">{{ category.count }} items</p>
         </div>
       </div>
     </div>

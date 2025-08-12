@@ -1,16 +1,18 @@
 <script setup>
 import { ref } from 'vue'
 import HtmlRenderer from './components/HtmlRenderer.vue'
+import GlobalStylesSection from './components/GlobalStylesSection.vue'
+import ComponentStylesSection from './components/ComponentStylesSection.vue'
 import defaultStyles from './data/globalStyles.json'
 
 
 const availableComponents = [
-  { id: 'SearchBar', name: 'Search Bar', used: false },
-  { id: 'SortingOptions', name: 'Sorting Options', used: false },
-  { id: 'ProductFeed', name: 'Product Feed', used: false },
-  { id: 'Facets', name: 'Facets', used: false },
-  { id: 'Pages', name: 'Pages', used: false },
-  { id: 'Categories', name: 'Categories', used: false }
+  { id: 'SearchBar', name: 'search', used: false },
+  { id: 'SortingOptions', name: 'sort', used: false },
+  { id: 'ProductFeed', name: 'products', used: false },
+  { id: 'Facets', name: 'facets', used: false },
+  { id: 'Pages', name: 'pages', used: false },
+  { id: 'Categories', name: 'categories', used: false }
 ]
 
 const layout = ref([])
@@ -259,12 +261,53 @@ const generateHTML = () => {
   }
   return ''
 }
+
+const calculateAvailableWidth = (rowIndex, currentColumnIndex) => {
+  const row = layout.value[rowIndex]
+  let usedWidth = 0
+  
+  row.columns.forEach((col, index) => {
+    if (index !== currentColumnIndex) {
+      usedWidth += parseFloat(col.width)
+    }
+  })
+  
+  return Math.max(100 - usedWidth, 0)
+}
+
+const getAvailableWidthOptions = (rowIndex, columnIndex) => {
+  const availableWidth = calculateAvailableWidth(rowIndex, columnIndex)
+  const options = []
+  
+  // Standard width options that fit within available space
+  const standardWidths = [15, 20, 25, 30, 33, 40, 50, 60, 66, 75, 80, 100]
+  
+  for (const width of standardWidths) {
+    if (width <= availableWidth) {
+      options.push(`${width}%`)
+    }
+  }
+  
+  // Add the exact remaining width if it's not already in the list
+  if (availableWidth > 0 && availableWidth % 1 !== 0) {
+    const exactWidth = `${availableWidth.toFixed(1)}%`
+    if (!options.includes(exactWidth)) {
+      options.push(exactWidth)
+    }
+  }
+  
+  return options.sort((a, b) => parseFloat(a) - parseFloat(b))
+}
+
+const handleStyleChange = (details) => {
+  addToHistory('Style Change', details)
+}
 </script>
 
 <template>
   <div class="design-editor" :class="{ 'dark-mode': darkMode }">
     <header class="editor-header">
-      <h1>Design Editor</h1>
+      <h1>omnisearch design editor</h1>
       <div class="header-controls">
         <div class="tabs">
           <button 
@@ -274,16 +317,16 @@ const generateHTML = () => {
             Editor
           </button>
           <button 
-            :class="{ active: activeTab === 'styles' }"
-            @click="activeTab = 'styles'"
-          >
-            Global Styles
-          </button>
-          <button 
             :class="{ active: activeTab === 'preview' }"
             @click="activeTab = 'preview'"
           >
             Preview
+          </button>
+          <button 
+            :class="{ active: activeTab === 'styles' }"
+            @click="activeTab = 'styles'"
+          >
+            Global Styles
           </button>
           <button 
             :class="{ active: activeTab === 'history' }"
@@ -315,7 +358,7 @@ const generateHTML = () => {
       <!-- Editor Tab -->
       <div v-if="activeTab === 'editor'" class="editor-content">
         <div class="sidebar">
-          <h3>Available Components</h3>
+          <h3>available components</h3>
           <div class="component-list">
             <div 
               v-for="component in availableComponents" 
@@ -323,21 +366,21 @@ const generateHTML = () => {
               :class="{ 'component-item': true, 'used': component.used }"
             >
               <span>{{ component.name }}</span>
-              <span v-if="component.used" class="used-label">Used</span>
+              <span v-if="component.used" class="used-label">Y</span>
             </div>
-          </div>
-          
-          <div class="actions">
-            <button @click="addRow" class="btn-primary">Add Row</button>
           </div>
         </div>
 
         <div class="canvas">
           <div v-if="layout.length === 0" class="empty-canvas">
-            <p>Click "Add Row" to start building your layout</p>
+            <p>start by adding a row to start building your layout</p>
+            <div class="actions">
+              <button @click="addRow" class="btn-primary">add row</button>
+            </div>
           </div>
           
-          <div v-for="(row, rowIndex) in layout" :key="row.id" class="row-container">
+          <transition-group name="row" tag="div" class="rows-container">
+            <div v-for="(row, rowIndex) in layout" :key="row.id" class="row-container">
             <div class="row-header">
               <span>Row {{ rowIndex + 1 }}</span>
               <div class="row-controls">
@@ -349,13 +392,15 @@ const generateHTML = () => {
             </div>
             
             <div class="row-content">
-              <div 
-                v-for="(column, columnIndex) in row.columns" 
-                :key="column.id"
-                class="column-container"
-                :style="{ width: column.width }"
-              >
-                <div class="column-header">
+              <transition-group name="column" tag="div" class="columns-container">
+                <div 
+                  v-for="(column, columnIndex) in row.columns" 
+                  :key="column.id"
+                  class="column-container"
+                  :style="{ width: column.width }"
+                >
+                <div class="column-inner">
+                  <div class="column-header">
                   <span>
                     Column {{ columnIndex + 1 }} ({{ column.width }})
                     <span v-if="column.manualWidth" class="manual-width-indicator" title="Manual width set">📌</span>
@@ -364,11 +409,15 @@ const generateHTML = () => {
                     <button @click="moveColumnLeft(rowIndex, columnIndex)" :disabled="columnIndex === 0" title="Move Left">←</button>
                     <button @click="moveColumnRight(rowIndex, columnIndex)" :disabled="columnIndex === row.columns.length - 1" title="Move Right">→</button>
                     <div class="width-controls">
-                      <button @click="changeColumnWidth(rowIndex, columnIndex, '15%')" :class="{ active: column.width === '15%' }" title="15% Width">15%</button>
-                      <button @click="changeColumnWidth(rowIndex, columnIndex, '20%')" :class="{ active: column.width === '20%' }" title="20% Width">20%</button>
-                      <button @click="changeColumnWidth(rowIndex, columnIndex, '25%')" :class="{ active: column.width === '25%' }" title="25% Width">25%</button>
-                      <button @click="changeColumnWidth(rowIndex, columnIndex, '30%')" :class="{ active: column.width === '30%' }" title="30% Width">30%</button>
-                      <button @click="changeColumnWidth(rowIndex, columnIndex, '50%')" :class="{ active: column.width === '50%' }" title="50% Width">50%</button>
+                      <button 
+                        v-for="widthOption in getAvailableWidthOptions(rowIndex, columnIndex)" 
+                        :key="widthOption"
+                        @click="changeColumnWidth(rowIndex, columnIndex, widthOption)" 
+                        :class="{ active: column.width === widthOption }" 
+                        :title="`${widthOption} Width`"
+                      >
+                        {{ widthOption }}
+                      </button>
                     </div>
                     <button @click="removeColumn(rowIndex, columnIndex)" class="btn-danger" title="Delete Column">×</button>
                   </div>
@@ -388,11 +437,12 @@ const generateHTML = () => {
                     </select>
                   </div>
                   
-                  <div 
-                    v-for="(component, componentIndex) in column.components" 
-                    :key="component.id"
-                    class="component-wrapper"
-                  >
+                  <transition-group name="component" tag="div" class="components-container">
+                    <div 
+                      v-for="(component, componentIndex) in column.components" 
+                      :key="component.id"
+                      class="component-wrapper"
+                    >
                     <div class="component-header">
                       <span>{{ component.type }}</span>
                       <div class="component-controls">
@@ -420,9 +470,17 @@ const generateHTML = () => {
                       </select>
                     </div>
                   </div>
+                  </transition-group>
+                </div>
                 </div>
               </div>
+              </transition-group>
             </div>
+          </div>
+          </transition-group>
+          
+          <div v-if="layout.length > 0" class="actions">
+            <button @click="addRow" class="btn-primary">add row</button>
           </div>
         </div>
       </div>
@@ -431,175 +489,19 @@ const generateHTML = () => {
       <div v-if="activeTab === 'styles'" class="styles-content">
         <div class="styles-sections">
           <!-- Global Styles Section -->
-          <div class="style-section">
-            <h3>Global Styles</h3>
-            <p class="section-description">These styles apply to all components</p>
-            <div class="style-controls">
-              <div class="style-group">
-                <label>Font Size:</label>
-                <input v-model="globalStyles.global.fontSize" type="text" placeholder="16px" @input="addToHistory('Style Change', 'Updated global font size')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Font Family:</label>
-                <select v-model="globalStyles.global.fontFamily" @change="addToHistory('Style Change', 'Updated global font family')">
-                  <option value="Arial, sans-serif">Arial</option>
-                  <option value="Helvetica, sans-serif">Helvetica</option>
-                  <option value="'Times New Roman', serif">Times New Roman</option>
-                  <option value="Georgia, serif">Georgia</option>
-                  <option value="'Courier New', monospace">Courier New</option>
-                </select>
-              </div>
-              
-              <div class="style-group">
-                <label>Primary Color:</label>
-                <input v-model="globalStyles.global.primaryColor" type="color" @input="addToHistory('Style Change', 'Updated primary color')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Background Color:</label>
-                <input v-model="globalStyles.global.backgroundColor" type="color" @input="addToHistory('Style Change', 'Updated background color')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Text Color:</label>
-                <input v-model="globalStyles.global.textColor" type="color" @input="addToHistory('Style Change', 'Updated text color')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Title Color:</label>
-                <input v-model="globalStyles.global.titleColor" type="color" @input="addToHistory('Style Change', 'Updated title color')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Link Color:</label>
-                <input v-model="globalStyles.global.linkColor" type="color" @input="addToHistory('Style Change', 'Updated link color')" />
-              </div>
-              
-              <div class="style-group">
-                <label>Button Color:</label>
-                <input v-model="globalStyles.global.buttonColor" type="color" @input="addToHistory('Style Change', 'Updated button color')" />
-              </div>
-            </div>
-          </div>
+          <GlobalStylesSection 
+            :globalStyles="globalStyles" 
+            @styleChange="handleStyleChange" 
+          />
 
           <!-- Component Styles Sections -->
-          <div class="style-section" v-for="(componentStyle, componentName) in globalStyles.components" :key="componentName">
-            <h4>{{ componentName }} Styles</h4>
-            <div class="style-controls">
-              <!-- SearchBar specific styles -->
-              <template v-if="componentName === 'SearchBar'">
-                <div class="style-group">
-                  <label>Input Border Color:</label>
-                  <input v-model="componentStyle.inputBorderColor" type="color" @input="addToHistory('Style Change', 'Updated SearchBar input border color')" />
-                </div>
-                <div class="style-group">
-                  <label>Input Focus Color:</label>
-                  <input v-model="componentStyle.inputFocusColor" type="color" @input="addToHistory('Style Change', 'Updated SearchBar input focus color')" />
-                </div>
-                <div class="style-group">
-                  <label>Button Hover Color:</label>
-                  <input v-model="componentStyle.buttonHoverColor" type="color" @input="addToHistory('Style Change', 'Updated SearchBar button hover color')" />
-                </div>
-              </template>
-
-              <!-- SortingOptions specific styles -->
-              <template v-if="componentName === 'SortingOptions'">
-                <div class="style-group">
-                  <label>Label Color:</label>
-                  <input v-model="componentStyle.labelColor" type="color" @input="addToHistory('Style Change', 'Updated SortingOptions label color')" />
-                </div>
-                <div class="style-group">
-                  <label>Select Border Color:</label>
-                  <input v-model="componentStyle.selectBorderColor" type="color" @input="addToHistory('Style Change', 'Updated SortingOptions select border color')" />
-                </div>
-                <div class="style-group">
-                  <label>Select Focus Color:</label>
-                  <input v-model="componentStyle.selectFocusColor" type="color" @input="addToHistory('Style Change', 'Updated SortingOptions select focus color')" />
-                </div>
-              </template>
-
-              <!-- ProductFeed specific styles -->
-              <template v-if="componentName === 'ProductFeed'">
-                <div class="style-group">
-                  <label>Product Title Color:</label>
-                  <input v-model="componentStyle.titleColor" type="color" @input="addToHistory('Style Change', 'Updated ProductFeed title color')" />
-                </div>
-                <div class="style-group">
-                  <label>Price Color:</label>
-                  <input v-model="componentStyle.priceColor" type="color" @input="addToHistory('Style Change', 'Updated ProductFeed price color')" />
-                </div>
-                <div class="style-group">
-                  <label>Rating Color:</label>
-                  <input v-model="componentStyle.ratingColor" type="color" @input="addToHistory('Style Change', 'Updated ProductFeed rating color')" />
-                </div>
-                <div class="style-group">
-                  <label>Card Border Color:</label>
-                  <input v-model="componentStyle.cardBorderColor" type="color" @input="addToHistory('Style Change', 'Updated ProductFeed card border color')" />
-                </div>
-              </template>
-
-              <!-- Facets specific styles -->
-              <template v-if="componentName === 'Facets'">
-                <div class="style-group">
-                  <label>Facet Title Color:</label>
-                  <input v-model="componentStyle.titleColor" type="color" @input="addToHistory('Style Change', 'Updated Facets title color')" />
-                </div>
-                <div class="style-group">
-                  <label>Facet Label Color:</label>
-                  <input v-model="componentStyle.labelColor" type="color" @input="addToHistory('Style Change', 'Updated Facets label color')" />
-                </div>
-                <div class="style-group">
-                  <label>Option Text Color:</label>
-                  <input v-model="componentStyle.optionColor" type="color" @input="addToHistory('Style Change', 'Updated Facets option color')" />
-                </div>
-                <div class="style-group">
-                  <label>Container Background:</label>
-                  <input v-model="componentStyle.containerBackground" type="color" @input="addToHistory('Style Change', 'Updated Facets container background')" />
-                </div>
-              </template>
-
-              <!-- Pages specific styles -->
-              <template v-if="componentName === 'Pages'">
-                <div class="style-group">
-                  <label>Title Color:</label>
-                  <input v-model="componentStyle.titleColor" type="color" @input="addToHistory('Style Change', 'Updated Pages title color')" />
-                </div>
-                <div class="style-group">
-                  <label>Link Color:</label>
-                  <input v-model="componentStyle.linkColor" type="color" @input="addToHistory('Style Change', 'Updated Pages link color')" />
-                </div>
-                <div class="style-group">
-                  <label>Link Hover Color:</label>
-                  <input v-model="componentStyle.linkHoverColor" type="color" @input="addToHistory('Style Change', 'Updated Pages link hover color')" />
-                </div>
-                <div class="style-group">
-                  <label>Container Background:</label>
-                  <input v-model="componentStyle.containerBackground" type="color" @input="addToHistory('Style Change', 'Updated Pages container background')" />
-                </div>
-              </template>
-
-              <!-- Categories specific styles -->
-              <template v-if="componentName === 'Categories'">
-                <div class="style-group">
-                  <label>Title Color:</label>
-                  <input v-model="componentStyle.titleColor" type="color" @input="addToHistory('Style Change', 'Updated Categories title color')" />
-                </div>
-                <div class="style-group">
-                  <label>Category Name Color:</label>
-                  <input v-model="componentStyle.nameColor" type="color" @input="addToHistory('Style Change', 'Updated Categories name color')" />
-                </div>
-                <div class="style-group">
-                  <label>Count Text Color:</label>
-                  <input v-model="componentStyle.countColor" type="color" @input="addToHistory('Style Change', 'Updated Categories count color')" />
-                </div>
-                <div class="style-group">
-                  <label>Icon Size:</label>
-                  <input v-model="componentStyle.iconSize" type="text" placeholder="48px" @input="addToHistory('Style Change', 'Updated Categories icon size')" />
-                </div>
-              </template>
-            </div>
-          </div>
+          <ComponentStylesSection 
+            v-for="(componentStyle, componentName) in globalStyles.components" 
+            :key="componentName"
+            :componentName="componentName"
+            :componentStyle="componentStyle"
+            @styleChange="handleStyleChange"
+          />
         </div>
       </div>
 
@@ -646,4 +548,3 @@ const generateHTML = () => {
     </main>
   </div>
 </template>
-
